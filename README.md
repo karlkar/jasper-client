@@ -23,19 +23,9 @@ If you're still having trouble, the next place to look would be the new **[Googl
 
 ## Contact
 
-Jasper's core developers are [Shubhro Saha](http://www.princeton.edu/~saha/), [Charles Marsh](http://www.princeton.edu/~crmarsh/) and [Jan Holthuis](http://homepage.ruhr-uni-bochum.de/Jan.Holthuis/).  All of them can be reached by email at [saha@princeton.edu](mailto:saha@princeton.edu), [crmarsh@princeton.edu](mailto:crmarsh@princeton.edu) and [jan.holthuis@ruhr-uni-bochum.de](mailto:jan.holthuis@ruhr-uni-bochum.de) respectively. However, for technical support and other problems, please go through the channels mentioned above.
+Jasper's core developers are [Shubhro Saha](http://www.shubhro.com), [Charles Marsh](http://www.crmarsh.com) and [Jan Holthuis](http://homepage.ruhr-uni-bochum.de/Jan.Holthuis/).  All of them can be reached by email at [saha@princeton.edu](mailto:saha@princeton.edu), [crmarsh@princeton.edu](mailto:crmarsh@princeton.edu) and [jan.holthuis@ruhr-uni-bochum.de](mailto:jan.holthuis@ruhr-uni-bochum.de) respectively. However, for technical support and other problems, please go through the channels mentioned above.
 
 For a complete list of code contributors, please see [AUTHORS.md](AUTHORS.md).
-
-## Major Updates
-- 2015-01-19: Added a new TTS engine for [Flite (festival-lite)](https://github.com/jasperproject/jasper-client/pull/286) and an experimental STT engine for [Julius ](https://github.com/jasperproject/jasper-client/pull/285)
-- 2015-01-07: [Added a new STT engine](https://github.com/jasperproject/jasper-client/pull/229) for Wit.ai
-- 2014-11-05: [Added a new TTS engine](https://github.com/jasperproject/jasper-client/pull/229) for MaryTTS
-- 2014-10-13: [Brand-new vocabulary compiler](https://github.com/jasperproject/jasper-client/pull/181) that introduces versioning, so that compilation is only performed when needed.
-- 2014-09-27: [Improved TTS implementation](https://github.com/jasperproject/jasper-client/pull/155) and new TTS engines for Festival, SVOX Pico and Google TTS.
-- 2014-08-09: [Modularized STT implementation](https://github.com/jasperproject/jasper-client/pull/118) with Google Speech API example, thanks to astahlman. Running `populate.py` after updating is highly recommended.
-- 2014-07-11: More [platform-independent audio output](https://github.com/jasperproject/jasper-client/pull/100). Thank you, astahlman!
-- 2014-05-27: The network setup wizard has been removed because of unreliability. The client code and documentation has been updated, requiring new users to manually configure their `/etc/network/interfaces` file.
 
 ## License
 
