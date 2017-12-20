@@ -1,49 +1,77 @@
-#!/usr/bin/env python2
-# -*- coding: utf-8-*-
+# -*- coding: utf-8 -*-
 import unittest
+import tempfile
 import mock
-from client import brain, test_mic
+from jasper import testutils
+from jasper import brain
 
 
-DEFAULT_PROFILE = {
-    'prefers_email': False,
-    'location': 'Cape Town',
-    'timezone': 'US/Eastern',
-    'phone_number': '012344321'
-}
+class ExamplePlugin(object):
+    def __init__(self, phrases, priority=0):
+        self.phrases = phrases
+        self.priority = priority
+        self.info = type('', (object,), {'name': 'foo'})()
+
+    def get_phrases(self):
+        return self.phrases
+
+    def get_priority(self):
+        return self.priority
+
+    def is_valid(self, text):
+        return (text in self.phrases)
 
 
 class TestBrain(unittest.TestCase):
-
-    @staticmethod
-    def _emptyBrain():
-        mic = test_mic.Mic([])
-        profile = DEFAULT_PROFILE
-        return brain.Brain(mic, profile)
-
-    def testLog(self):
-        """Does Brain correctly log errors when raised by modules?"""
-        my_brain = TestBrain._emptyBrain()
-        unclear = my_brain.modules[-1]
-        with mock.patch.object(unclear, 'handle') as mocked_handle:
-            with mock.patch.object(my_brain._logger, 'error') as mocked_log:
-                mocked_handle.side_effect = KeyError('foo')
-                my_brain.query("zzz gibberish zzz")
-                self.assertTrue(mocked_log.called)
-
-    def testSortByPriority(self):
-        """Does Brain sort modules by priority?"""
-        my_brain = TestBrain._emptyBrain()
-        priorities = filter(lambda m: hasattr(m, 'PRIORITY'), my_brain.modules)
-        target = sorted(priorities, key=lambda m: m.PRIORITY, reverse=True)
-        self.assertEqual(target, priorities)
-
     def testPriority(self):
-        """Does Brain correctly send query to higher-priority module?"""
-        my_brain = TestBrain._emptyBrain()
-        hn_module = 'HN'
-        hn = filter(lambda m: m.__name__ == hn_module, my_brain.modules)[0]
+        """Does Brain sort modules by priority?"""
+        my_brain = brain.Brain(testutils.TEST_PROFILE)
 
-        with mock.patch.object(hn, 'handle') as mocked_handle:
-            my_brain.query(["hacker news"])
-            self.assertTrue(mocked_handle.called)
+        plugin1 = ExamplePlugin(['MOCK1'], priority=1)
+        plugin2 = ExamplePlugin(['MOCK1'], priority=999)
+        plugin3 = ExamplePlugin(['MOCK2'], priority=998)
+        plugin4 = ExamplePlugin(['MOCK1'], priority=0)
+        plugin5 = ExamplePlugin(['MOCK2'], priority=-3)
+
+        for plugin in (plugin1, plugin2, plugin3, plugin4, plugin5):
+            my_brain.add_plugin(plugin)
+
+        expected_order = [plugin2, plugin3, plugin1, plugin4, plugin5]
+        self.assertEqual(expected_order, my_brain.get_plugins())
+
+        input_texts = ['MOCK1']
+        plugin, output_text = my_brain.query(input_texts)
+        self.assertIs(plugin, plugin2)
+        self.assertEqual(input_texts[0], output_text)
+
+        input_texts = ['MOCK2']
+        plugin, output_text = my_brain.query(input_texts)
+        self.assertIs(plugin, plugin3)
+        self.assertEqual(input_texts[0], output_text)
+
+    def testPluginPhraseExtraction(self):
+        expected_phrases = ['MOCK1', 'MOCK2']
+
+        my_brain = brain.Brain(testutils.TEST_PROFILE)
+
+        my_brain.add_plugin(ExamplePlugin(['MOCK2']))
+        my_brain.add_plugin(ExamplePlugin(['MOCK1']))
+
+        extracted_phrases = my_brain.get_plugin_phrases()
+
+        self.assertEqual(expected_phrases, extracted_phrases)
+
+    def testStandardPhraseExtraction(self):
+        expected_phrases = ['MOCK']
+
+        my_brain = brain.Brain(testutils.TEST_PROFILE)
+
+        with tempfile.TemporaryFile() as f:
+            # We can't use mock_open here, because it doesn't seem to work
+            # with the 'for line in f' syntax
+            f.write("MOCK\n")
+            f.seek(0)
+            with mock.patch('%s.open' % brain.__name__,
+                            return_value=f, create=True):
+                extracted_phrases = my_brain.get_standard_phrases()
+        self.assertEqual(expected_phrases, extracted_phrases)
