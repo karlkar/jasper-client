@@ -42,10 +42,13 @@ class PocketsphinxSTTPlugin(plugin.STTPlugin):
 
         vocabulary_path = self.compile_vocabulary(
             sphinxvocab.compile_vocabulary)
+        
 
-        lm_path = sphinxvocab.get_languagemodel_path(vocabulary_path)
-        dict_path = sphinxvocab.get_dictionary_path(vocabulary_path)
-
+        #lm_path = sphinxvocab.get_languagemodel_path(vocabulary_path)
+        #dict_path = sphinxvocab.get_dictionary_path(vocabulary_path)
+        lm_path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"jasper.lm")
+        dict_path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"jasper.dic")
+        
         try:
             hmm_dir = self.profile['pocketsphinx']['hmm_dir']
         except KeyError:
@@ -89,9 +92,13 @@ class PocketsphinxSTTPlugin(plugin.STTPlugin):
 
         if self._pocketsphinx_v5:
             # Pocketsphinx v5
+            #self._logger.info("Pocketsphinx v5")
             config = pocketsphinx.Decoder.default_config()
+            self._logger.info("-hmm %s",hmm_dir)
             config.set_string('-hmm', hmm_dir)
+            self._logger.info("-lm %s",lm_path)
             config.set_string('-lm', lm_path)
+            self._logger.info("-dict %s",dict_path)
             config.set_string('-dict', dict_path)
             config.set_string('-logfn', self._logfile)
             self._decoder = pocketsphinx.Decoder(config)
@@ -134,4 +141,5 @@ class PocketsphinxSTTPlugin(plugin.STTPlugin):
 
         transcribed = [result] if result != '' else []
         self._logger.info('Transcribed: %r', transcribed)
+        print(">> %r" % transcribed)
         return transcribed
