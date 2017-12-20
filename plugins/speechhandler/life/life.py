@@ -17,7 +17,7 @@ class MeaningOfLifePlugin(plugin.SpeechHandlerPlugin):
         mic -- used to interact with the user (for both input and output)
         """
         messages = [
-            self.gettext("It's 42, you idiot."),
+            self.gettext("It's 42."),
             self.gettext("It's 42. How many times do I have to tell you?")
         ]
 
