@@ -54,6 +54,8 @@ class Mic(object):
                                                  1024)
         self._output_chunksize = get_config_value(config, 'output_chunksize',
                                                   1024)
+        self._yes=tempfile.SpooledTemporaryFile()
+        self._yes.write(self.tts_engine.say("yes"))
         try:
             output_padding = config['audio']['output_padding']
         except KeyError:
@@ -75,6 +77,7 @@ class Mic(object):
                            'yes' if self._output_padding else 'no')
 
         self._threshold = 2.0**self._input_bits
+        self._transcribed = ""
 
     @contextlib.contextmanager
     def special_mode(self, name, phrases):
@@ -124,13 +127,14 @@ class Mic(object):
             frames = frame_queue.get()
             with self._write_frames_to_file(frames) as f:
                 try:
-                    transcribed = self.passive_stt_engine.transcribe(f)
+                    self._transcribed = self.passive_stt_engine.transcribe(f)
+                    print( "Transcribed: %r" % self._transcribed )
                 except:
                     dbg = (self._logger.getEffectiveLevel() == logging.DEBUG)
                     self._logger.error("Transcription failed!", exc_info=dbg)
                 else:
-                    if transcribed and any([keyword.lower() in t.lower()
-                                            for t in transcribed if t]):
+                    if self._transcribed and any([keyword.lower() in t.lower()
+                                            for t in self._transcribed if t]):
                         keyword_uttered.set()
                 finally:
                     frame_queue.task_done()
@@ -159,8 +163,11 @@ class Mic(object):
                                                self._input_channels,
                                                self._input_rate):
             if keyword_uttered.is_set():
-                self._logger.info("Keyword %s has been uttered", keyword)
-                return
+                if self._logger.isEnabledFor(logging.DEBUG):
+                    self._logger.info("Keyword %s has been uttered", keyword)
+                else:
+                    print(">> %r" % self._transcribed)
+                return self._transcribed
             frames.append(frame)
             if not recording:
                 snr = self._snr([frame])
@@ -197,13 +204,19 @@ class Mic(object):
                             audioop.rms(b"".join(frames), 2))
 
     def listen(self):
-        self.wait_for_keyword(self._keyword)
-        return self.active_listen()
+        response=self.wait_for_keyword(self._keyword)
+        if( response == "['JASPER']" ):
+            print("Active Listen")
+            response=self.active_listen()
+        print( response )
+        return response
 
     def active_listen(self, timeout=3):
         # record until <timeout> second of silence or double <timeout>.
         n = int(round((self._input_rate/self._input_chunksize)*timeout))
-        self.play_file(paths.data('audio', 'beep_hi.wav'))
+        # self.play_file(paths.data('audio', 'beep_hi.wav'))
+        self._yes.seek(0)
+        self._output_device.play_fp(self._yes)
         frames = []
         for frame in self._input_device.record(self._input_chunksize,
                                                self._input_bits,
@@ -213,7 +226,7 @@ class Mic(object):
             if len(frames) >= 2*n or (
                     len(frames) > n and self._snr(frames[-n:]) <= 3):
                 break
-        self.play_file(paths.data('audio', 'beep_lo.wav'))
+        # self.play_file(paths.data('audio', 'beep_lo.wav'))
         with self._write_frames_to_file(frames) as f:
             return self.active_stt_engine.transcribe(f)
 
@@ -224,6 +237,7 @@ class Mic(object):
                                       add_padding=self._output_padding)
 
     def say(self, phrase):
+        print("<< "+phrase)
         altered_phrase = alteration.clean(phrase)
         with tempfile.SpooledTemporaryFile() as f:
             f.write(self.tts_engine.say(altered_phrase))

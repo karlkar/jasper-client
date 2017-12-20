@@ -4,6 +4,7 @@ import logging
 import imp
 import inspect
 import sys
+
 if sys.version_info < (3, 0):  # NOQA
     import ConfigParser as configparser
 else:  # NOQA
@@ -166,6 +167,7 @@ class PluginStore(object):
                             reason = e.msg
                         if not reason:
                             reason = 'Unknown'
+                        print( 'exception e:',e )
                         self._logger.warning(
                             "Plugin at '%s' skipped! (Reason: %s)",
                             root, reason,
@@ -197,7 +199,12 @@ class PluginStore(object):
         return PluginInfo(cp, plugin_class, translations, plugin_directory)
 
     def get_plugins_by_category(self, category):
+        print( "get_plugins_by_category: ",category )
         superclass = self._categories_map[category]
+        if(category=="speechhandler"):
+            for info in self._plugins.values():
+                if issubclass(info.plugin_class,superclass):
+                    print( info._path )
         return [info for info in self._plugins.values()
                 if issubclass(info.plugin_class, superclass)]
 

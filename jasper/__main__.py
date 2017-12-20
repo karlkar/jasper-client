@@ -31,7 +31,7 @@ def main(args=None):
     print("*******************************************************")
 
     # Set up logging
-    logging.basicConfig(level=logging.DEBUG if p_args.debug else logging.INFO)
+    logging.basicConfig(level=logging.INFO if p_args.debug else logging.ERROR)
 
     # Select Mic
     if p_args.local:

@@ -120,6 +120,7 @@ class Jasper(object):
             paths.config('plugins'),
             pkg_resources.resource_filename(__name__, '../plugins')
         ]
+        print( "plugin_directories: ",plugin_directories )
         self.plugins = pluginstore.PluginStore(plugin_directories)
         self.plugins.detect_plugins()
 

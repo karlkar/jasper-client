@@ -19,7 +19,7 @@ class Conversation(i18n.GettextMixin):
         #  self.notifier = Notifier(profile)
 
     def greet(self):
-        if 'first_name' in self.profile:
+        if False and 'first_name' in self.profile:
             salutation = (self.gettext("How can I be of service, %s?")
                           % self.profile["first_name"])
         else:
