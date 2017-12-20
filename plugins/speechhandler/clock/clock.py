@@ -81,22 +81,29 @@ class ClockPlugin(plugin.SpeechHandlerPlugin):
         else:
             tz = app_utils.get_timezone(self.profile)
         now = datetime.datetime.now(tz=tz)
-        currentHour=now.hour
-        ap="Ay-Em"
-        if( currentHour>12 ):
-            currentHour=currentHour-12
-            ap="Pee-Em"
-        if( currentHour==0 ):
-            currentHour=12
-        writtenHour=self.int_to_en(currentHour)
-        writtenMinute=self.int_to_en(now.minute)
-        if now.minute == 0:
-            fmt = "It is "+writtenHour+" "+ap+" right now"+where+"."
-        elif now.minute < 10:
-            fmt = "It is "+writtenHour+" oh "+writtenMinute+" "+ap+" right now"+where+"."
+        if( self.config['language']='en-US' ):
+            currentHour=now.hour
+            ap="Ay-Em"
+            if( currentHour>12 ):
+                currentHour=currentHour-12
+                ap="Pee-Em"
+            if( currentHour==0 ):
+                currentHour=12
+            writtenHour=self.int_to_en(currentHour)
+            writtenMinute=self.int_to_en(now.minute)
+            if now.minute == 0:
+                fmt = "It is "+writtenHour+" "+ap+" right now"+where+"."
+            elif now.minute < 10:
+                fmt = "It is "+writtenHour+" oh "+writtenMinute+" "+ap+" right now"+where+"."
+            else:
+                fmt = "It is "+writtenHour+" "+writtenMinute+" "+ap+" right now"+where+"."
+            mic.say(self.gettext(fmt).format(t=now))
         else:
-            fmt = "It is "+writtenHour+" "+writtenMinute+" "+ap+" right now"+where+"."
-        mic.say(self.gettext(fmt).format(t=now))
+            if now.minute == 0:
+                fmt = "It is {t:%l} {t:%P} right now."
+            else:
+                fmt = "It is {t:%l}:{t.minute} {t:%P} right now."
+            mic.say(self.gettext(fmt).format(t=now))
 
     def is_valid(self, text):
         """
