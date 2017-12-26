@@ -1,24 +1,30 @@
 # -*- coding: utf-8 -*-
 import logging
+import pdb
 from . import paths
 from . import i18n
 #  from notifier import Notifier
 
 
 class Conversation(i18n.GettextMixin):
-    def __init__(self, mic, brain, profile):
+    def __init__(self, application):
         translations = i18n.parse_translations(paths.data('locale'))
-        i18n.GettextMixin.__init__(self, translations, profile)
+        i18n.GettextMixin.__init__(self, translations, application.config)
         self._logger = logging.getLogger(__name__)
-        self.mic = mic
-        self.profile = profile
-        self.brain = brain
+        self.application = application
+        self.mic = application.mic
+        self.profile = application.config
+        self.brain = application.brain
         self.translations = {
 
         }
         #  self.notifier = Notifier(profile)
 
     def greet(self):
+        # cute, but you don't know who is around to address the system.
+        # you also don't really care. If speaker recognition can be added
+        # this might make some sense, but since this is the first utterance
+        # probably not.
         if False and 'first_name' in self.profile:
             salutation = (self.gettext("How can I be of service, %s?")
                           % self.profile["first_name"])
@@ -41,9 +47,10 @@ class Conversation(i18n.GettextMixin):
 
             if input:
                 plugin, text = self.brain.query(input)
+                #pdb.set_trace()
                 if plugin and text:
                     try:
-                        plugin.handle(text, self.mic)
+                        plugin.handle(text,self)
                     except Exception:
                         self._logger.error('Failed to execute module',
                                            exc_info=True)

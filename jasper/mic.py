@@ -50,10 +50,8 @@ class Mic(object):
         self._input_rate = get_config_value(config, 'input_samplerate', 16000)
         self._input_bits = get_config_value(config, 'input_samplewidth', 16)
         self._input_channels = get_config_value(config, 'input_channels', 1)
-        self._input_chunksize = get_config_value(config, 'input_chunksize',
-                                                 1024)
-        self._output_chunksize = get_config_value(config, 'output_chunksize',
-                                                  1024)
+        self._input_chunksize = get_config_value(config, 'input_chunksize',1024)
+        self._output_chunksize = get_config_value(config, 'output_chunksize',1024)
         self._yes=tempfile.SpooledTemporaryFile()
         self._yes.write(self.tts_engine.say("yes"))
         try:
@@ -205,18 +203,21 @@ class Mic(object):
 
     def listen(self):
         response=self.wait_for_keyword(self._keyword)
-        if( response == "['JASPER']" ):
-            print("Active Listen")
+        # What I really want to do here is check to see if there is a speechhandler plugin keyword
+        # here. If so, handle it, if not then start actively listening.
+        if( response == [self._keyword.upper()] ):
+            self._logger.debug("Active Listen")
             response=self.active_listen()
-        print( response )
+        self._logger.debug( "<< "+str(response) )
         return response
 
-    def active_listen(self, timeout=3):
+    def active_listen(self, indicator=1, timeout=3):
         # record until <timeout> second of silence or double <timeout>.
         n = int(round((self._input_rate/self._input_chunksize)*timeout))
-        # self.play_file(paths.data('audio', 'beep_hi.wav'))
-        self._yes.seek(0)
-        self._output_device.play_fp(self._yes)
+        if( indicator ):
+            # self.play_file(paths.data('audio', 'beep_hi.wav'))
+            self._yes.seek(0)
+            self._output_device.play_fp(self._yes)
         frames = []
         for frame in self._input_device.record(self._input_chunksize,
                                                self._input_bits,

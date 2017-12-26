@@ -35,31 +35,34 @@ def execute(executable, fst_model, input, is_file=False, nbest=None):
         # and stderr, because it looks like Phonetisaurus can't open
         # an already opened file descriptor a second time. This is why
         # we have to use this somehow hacky subprocess.Popen approach.
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         while proc.poll() is None:
             nextline = proc.stderr.readline()
-            if nextline == '':
+            logger.debug("NextLine: '%s'"%nextline)
+            if( nextline == '' ):
                 continue
-            if len(RE_ISYMNOTFOUND.findall(nextline)) > 0:
-                logger.debug(nextline)
-                proc.kill()
-                raise ValueError('Input symbol not found')
+            if( len(RE_ISYMNOTFOUND.findall(nextline)) > 0 ):
+                # instead of killing the process or raising an error, just skip the line.
+                # this will create the checksum so that jasper won't re-compile the vocabulary
+                # so that I can replace the failed files with ones I build using the 
+                # http://www.speech.cs.cmu.edu/tools/lmtool-new.html language model tool
+                logger.error('Input symbol not found')
+                continue
+                #proc.kill()
+                #raise ValueError('Input symbol not found')
         stdoutdata, stderrdata = proc.communicate()
     except OSError:
-        logger.error("Error occured while executing command '%s'",
-                     ' '.join(cmd), exc_info=True)
+        logger.error("Error occured while executing command '%s'",' '.join(cmd), exc_info=True)
         raise
 
-    if stderrdata:
+    if( stderrdata ):
         for line in stderrdata.splitlines():
             message = line.strip()
-            if message:
+            if( message ):
                 logger.debug(message)
 
-    if proc.returncode != 0:
-        logger.error("Command '%s' return with exit status %d",
-                     ' '.join(cmd), proc.returncode)
+    if( proc.returncode!=0 ):
+        logger.error("Command '%s' return with exit status %d",' '.join(cmd), proc.returncode)
         raise OSError("Command execution failed")
 
     result = {}
@@ -74,9 +77,7 @@ def execute(executable, fst_model, input, is_file=False, nbest=None):
 
 
 class PhonetisaurusG2P(object):
-    def __init__(self, executable, fst_model,
-                 fst_model_alphabet='arpabet',
-                 nbest=None):
+    def __init__(self, executable, fst_model,fst_model_alphabet='arpabet',nbest=None):
         self._logger = logging.getLogger(__name__)
 
         self.executable = executable
@@ -85,15 +86,14 @@ class PhonetisaurusG2P(object):
         self._logger.debug("Using FST model: '%s'", self.fst_model)
 
         self.fst_model_alphabet = fst_model_alphabet
-        self._logger.debug("Using FST model alphabet: '%s'",
-                           self.fst_model_alphabet)
+        self._logger.debug("Using FST model alphabet: '%s'",self.fst_model_alphabet)
 
         self.nbest = nbest
-        if self.nbest is not None:
+        if( self.nbest is not None ):
             self._logger.debug("Will use the %d best results.", self.nbest)
 
     def _convert_phonemes(self, data):
-        if self.fst_model_alphabet == 'xsampa':
+        if( self.fst_model_alphabet=='xsampa' ):
             print(data)
             for word in data:
                 converted_phonemes = []
@@ -107,8 +107,7 @@ class PhonetisaurusG2P(object):
         raise ValueError('Invalid FST model alphabet!')
 
     def _translate_word(self, word):
-        return execute(self.executable, self.fst_model, word,
-                       nbest=self.nbest)
+        return execute(self.executable, self.fst_model, word,nbest=self.nbest)
 
     def _translate_words(self, words):
         with tempfile.NamedTemporaryFile(suffix='.g2p', delete=False) as f:
@@ -116,10 +115,10 @@ class PhonetisaurusG2P(object):
             # won't work if we remove it, because it seems that I can't open
             # a file descriptor a second time.
             for word in words:
+                self._logger.debug(word)
                 f.write("%s\n" % word)
             tmp_fname = f.name
-        output = execute(self.executable, self.fst_model, tmp_fname,
-                         is_file=True, nbest=self.nbest)
+        output = execute(self.executable, self.fst_model, tmp_fname,is_file=True, nbest=self.nbest)
         os.remove(tmp_fname)
         return output
 

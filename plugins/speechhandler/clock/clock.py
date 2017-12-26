@@ -81,7 +81,8 @@ class ClockPlugin(plugin.SpeechHandlerPlugin):
         else:
             tz = app_utils.get_timezone(self.profile)
         now = datetime.datetime.now(tz=tz)
-        if( self.config['language']='en-US' ):
+        #if( self.config['language']=='en-US' ):
+        if(1):
             currentHour=now.hour
             ap="Ay-Em"
             if( currentHour>12 ):

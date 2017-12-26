@@ -40,23 +40,23 @@ class PocketsphinxSTTPlugin(plugin.STTPlugin):
         self._logger.warning("This STT plugin doesn't have multilanguage " +
                              "support!")
 
-        vocabulary_path = self.compile_vocabulary(
-            sphinxvocab.compile_vocabulary)
+        vocabulary_path = self.compile_vocabulary(sphinxvocab.compile_vocabulary)
         
 
-        #lm_path = sphinxvocab.get_languagemodel_path(vocabulary_path)
-        #dict_path = sphinxvocab.get_dictionary_path(vocabulary_path)
-        lm_path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"jasper.lm")
-        dict_path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"jasper.dic")
+        lm_path = sphinxvocab.get_languagemodel_path(vocabulary_path)
+        self._logger.info( "lm_path: "+lm_path )
+        dict_path = sphinxvocab.get_dictionary_path(vocabulary_path)
+        self._logger.info( "dict_path: "+dict_path )
+        #The following lines where for importing a precompiled model and dictionary
+        #lm_path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"jasper.lm")
+        #dict_path=os.path.join(os.path.dirname(os.path.realpath(__file__)),"jasper.dic")
         
         try:
             hmm_dir = self.profile['pocketsphinx']['hmm_dir']
         except KeyError:
-            hmm_dir = "/usr/local/share/pocketsphinx/model/hmm/en_US/" + \
-                      "hub4wsj_sc_8k"
+            hmm_dir = "/usr/local/share/pocketsphinx/model/hmm/en_US/hub4wsj_sc_8k"
 
-        self._logger.debug("Initializing PocketSphinx Decoder with hmm_dir " +
-                           "'%s'", hmm_dir)
+        self._logger.debug("Initializing PocketSphinx Decoder with hmm_dir '%s'", hmm_dir)
 
         # Perform some checks on the hmm_dir so that we can display more
         # meaningful error messages if neccessary
