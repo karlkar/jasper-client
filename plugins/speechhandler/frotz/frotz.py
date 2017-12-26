@@ -81,7 +81,7 @@ class FrotzPlugin(plugin.SpeechHandlerPlugin):
                     if( current_location!=response.location ):
                         current_location=response.location
                         say_location=True
-                    if( !response.description ):
+                    if( not response.description ):
                         say_location=True
                     if( say_location ):
                         self._mic.say(response.location)

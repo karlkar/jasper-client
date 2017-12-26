@@ -117,7 +117,7 @@ class textPlayer:
     # Remove score and move information from output
     def clean_command_output(self, text):
         response=Response()
-        print( "Clean_command_output - input : %s",text )
+        print( "Clean_command_output - input : %s"%text )
         #regex_list = ['[0-9]+/[0-9+]', '^(.*)Score:[ ]*[-]*[0-9]+(.*)$', 'Moves:[ ]*[0-9]+', 'Turns:[ ]*[0-9]+', '[0-9]+:[0-9]+ [AaPp][Mm]', ' [0-9]+ \.'] # that last one is just for murderer.z5
         #for regex in regex_list:
         #    matchObj = re.findall(regex, text, re.I)
@@ -131,6 +131,12 @@ class textPlayer:
             if( len(matchObj) ):
                 response.location=matchObj[0][0]
                 response.description=matchObj[0][1]
+                # Sometimes the description contains a copy of the location at the beginning. Remove it if so.
+                #if( left(response.description,len(response.location))==response.location ):
+                #    response.description=response.description[len(response.location)+1:]
+                matchObj=re.findall('^\s*'+response.location+'\s*(.*)$',response.description,re.I)
+                if( len(matchObj) ):
+                    response.description=matchObj[0][0]
             else:
                 # otherwise, this was a simple error message from the parser which does not include a score
                 response.description=text
