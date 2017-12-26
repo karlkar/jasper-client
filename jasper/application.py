@@ -4,6 +4,7 @@ import os
 import shutil
 import yaml
 import pkg_resources
+import pdb
 
 from . import audioengine
 from . import brain
@@ -120,6 +121,7 @@ class Jasper(object):
             paths.config('plugins'),
             pkg_resources.resource_filename(__name__, '../plugins')
         ]
+        self._logger.debug( "plugin_directories: {0}".format(plugin_directories) )
         self.plugins = pluginstore.PluginStore(plugin_directories)
         self.plugins.detect_plugins()
 
@@ -129,8 +131,7 @@ class Jasper(object):
         self.audio = ae_info.plugin_class(ae_info, self.config)
 
         # Initialize audio input device
-        devices = [device.slug for device in self.audio.get_devices(
-            device_type=audioengine.DEVICE_TYPE_INPUT)]
+        devices = [device.slug for device in self.audio.get_devices(device_type=audioengine.DEVICE_TYPE_INPUT)]
         try:
             device_slug = self.config['input_device']
         except KeyError:
@@ -190,26 +191,21 @@ class Jasper(object):
             msg = 'No plugins for handling speech found!'
             self._logger.error(msg)
             raise RuntimeError(msg)
-        elif len(self.brain.get_all_phrases()) == 0:
+        elif len(self.brain.get_plugin_phrases()) == 0:
             msg = 'No command phrases found!'
             self._logger.error(msg)
             raise RuntimeError(msg)
 
-        active_stt_plugin_info = self.plugins.get_plugin(
-            active_stt_slug, category='stt')
-        active_stt_plugin = active_stt_plugin_info.plugin_class(
-            'default', self.brain.get_plugin_phrases(), active_stt_plugin_info,
-            self.config)
+        active_stt_plugin_info = self.plugins.get_plugin(active_stt_slug, category='stt')
+        #pdb.set_trace()
+        active_stt_plugin = active_stt_plugin_info.plugin_class('default', self.brain.get_plugin_phrases(), active_stt_plugin_info,self.config)
 
         if passive_stt_slug != active_stt_slug:
-            passive_stt_plugin_info = self.plugins.get_plugin(
-                passive_stt_slug, category='stt')
+            passive_stt_plugin_info = self.plugins.get_plugin(passive_stt_slug, category='stt')
         else:
             passive_stt_plugin_info = active_stt_plugin_info
 
-        passive_stt_plugin = passive_stt_plugin_info.plugin_class(
-            'keyword', self.brain.get_standard_phrases() + [keyword],
-            passive_stt_plugin_info, self.config)
+        passive_stt_plugin = passive_stt_plugin_info.plugin_class('keyword', self.brain.get_all_phrases() + [keyword],passive_stt_plugin_info, self.config)
 
         tts_plugin_info = self.plugins.get_plugin(tts_slug, category='tts')
         tts_plugin = tts_plugin_info.plugin_class(tts_plugin_info, self.config)
@@ -229,8 +225,7 @@ class Jasper(object):
                 passive_stt_plugin, active_stt_plugin,
                 tts_plugin, self.config, keyword=keyword)
 
-        self.conversation = conversation.Conversation(
-            self.mic, self.brain, self.config)
+        self.conversation = conversation.Conversation(self)
 
     def list_plugins(self):
         plugins = self.plugins.get_plugins()

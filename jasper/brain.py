@@ -47,7 +47,7 @@ class Brain(object):
                 phrase = line.strip()
                 if phrase:
                     phrases.append(phrase)
-
+        self._logger.info( "PHRASES: %s"%phrases )
         return phrases
 
     def get_plugin_phrases(self):
@@ -61,7 +61,7 @@ class Brain(object):
 
         for plugin in self._plugins:
             phrases.extend(plugin.get_phrases())
-
+        print( "PLUGIN PHRASES: ",sorted(list(set(phrases))) )
         return sorted(list(set(phrases)))
 
     def get_all_phrases(self):
