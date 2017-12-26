@@ -1,11 +1,11 @@
 This plugin is for playing infocom games with Jasper.
 
 To use it, you should download textPlayer from Daniel Ricks at https://github.com/danielricks/textplayer. Copy all of the .z5 game
-files into the games folder. I have already included a modified version of textplayer which does some handy things like split the
+files into the games folder. I have already included a modified version of textPlayer.py which does some handy things like split the
 location and description into different properties. I've only really worked on Zork1 so far, so your mileage may vary with other
 games.
 
-To use this with the Pocketsphinx speech to text engine requires some additional work. Firs, you will need to extract the games 
+To use this with the Pocketsphinx speech to text engine requires some additional work. First, you will need to extract the games 
 commands into a corpus file. For this, I used Zorkword by Mike Threepoint which can be downloaded from 
 http://mirror.ifarchive.org/if-archive/infocom/tools/zorkword.zip.
 
