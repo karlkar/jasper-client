@@ -1,0 +1,10 @@
+[Plugin]
+Name = shutdown
+Version = 0.1.0
+License = MIT
+URL = http://jasperproject.github.io/
+Description = Shutdown the jasper program
+
+[Author]
+Name = Aaron Chantrill
+
