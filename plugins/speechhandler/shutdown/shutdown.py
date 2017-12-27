@@ -9,7 +9,7 @@ class ShutdownPlugin(plugin.SpeechHandlerPlugin):
             self.gettext("SHUT DOWN")
                 ]
 
-    def handle(self, text, conversation):
+    def handle(self, text, mic, *args):
         """
         Responds to user-input, typically speech text, by shutting down
 
@@ -17,7 +17,7 @@ class ShutdownPlugin(plugin.SpeechHandlerPlugin):
         text -- user-input, typically transcribed speech
         mic -- used to interact with the user (for both input and output)
         """
-        conversation.mic.say('Shutting down')
+        mic.say('Shutting down')
         quit()
         
     def is_valid(self, text):

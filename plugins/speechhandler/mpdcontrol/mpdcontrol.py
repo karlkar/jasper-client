@@ -36,7 +36,7 @@ class MPDControlPlugin(plugin.SpeechHandlerPlugin):
     def get_phrases(self):
         return [self.gettext('MUSIC'), self.gettext('SPOTIFY')]
 
-    def handle(self, text, mic):
+    def handle(self, text, mic, *args):
         """
         Responds to user-input, typically speech text, by telling a joke.
 

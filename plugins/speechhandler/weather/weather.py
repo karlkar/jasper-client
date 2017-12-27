@@ -177,7 +177,7 @@ class WeatherPlugin(plugin.SpeechHandlerPlugin):
             self.gettext("YES"),
             self.gettext("NO")]
 
-    def handle(self, text, mic):
+    def handle(self, text, mic, args):
         """
         Responds to user-input, typically speech text, with a summary of
         the relevant weather for the requested date (typically, weather

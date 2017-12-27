@@ -45,7 +45,7 @@ class JokePlugin(plugin.SpeechHandlerPlugin):
     def get_phrases(self):
         return [self.gettext("JOKE")]
 
-    def handle(self, text, conversation):
+    def handle(self, text, mic, *args):
         """
         Responds to user-input, typically speech text, by telling a joke.
 

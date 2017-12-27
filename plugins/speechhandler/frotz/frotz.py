@@ -14,19 +14,24 @@ class FrotzPlugin(plugin.SpeechHandlerPlugin):
             self.gettext("BEGIN SIMULATION")
             ]
     
-    def handle(self,text,conversation):
-        self._mic=conversation.mic
-        self._logger=conversation._logger
+    def handle(self,text,mic,*args):
+        self._mic=mic
+        if( args ):
+            self._conversation=args[0]
+            self._logger=self.conversation._logger
+        else:
+            self._logger = logging.getLogger(__name__)
         #pdb.set_trace()
-        game="zork1"
-        game_name="zork one"
+        self.game="zork1"
+        self.game_name="zork one"
         if( "A MIND FOREVER VOYAGING" in text ):
-            game="AMFV"
-            game_name="a mind forever voyaging"
+            self.game="AMFV"
+            self.game_name="a mind forever voyaging"
         if( "HITCHHIKERS" in text ):
-            game="h2g2"
-            game_name="the hitchhiker's guide to the galaxy"
-        self._mic.say(self.gettext("beginning simulation "+game_name))
+            self.game="h2g2"
+            self.game_name="the hitchhiker's guide to the galaxy"
+        self.savefile=os.path.join(os.path.dirname(os.path.realpath(__file__)),"games",self.game+".sav")
+        self._mic.say(self.gettext("beginning simulation "+self.game_name))
         #active_stt_slug = conversation.config['stt_engine']
         #frotz_stt_plugin_info = conversation.application.plugins.get_plugin(active_stt_slug, category='stt')
         #frotz_stt_plugin = frotz_stt_plugin_info.plugin_class('default', self.brain.get_plugin_phrases(), frotz_stt_plugin_info,conversation.config)
@@ -39,7 +44,7 @@ class FrotzPlugin(plugin.SpeechHandlerPlugin):
         #    mic.say(str(text))
         
         # open zork1.corpus in the current directory and create a phrase list from it
-        corpus = os.path.join(os.path.dirname(os.path.realpath(__file__)),"games",game+".corpus")
+        corpus = os.path.join(os.path.dirname(os.path.realpath(__file__)),"games",self.game+".corpus")
         phrases=['END SIMULATION']
         with open(corpus, "r") as f:
             for line in f:
@@ -49,10 +54,13 @@ class FrotzPlugin(plugin.SpeechHandlerPlugin):
                 phrases.append(line)
 
         self._logger.debug('Starting frotz mode...')
-        with self._mic.special_mode(game, phrases):
+        with self._mic.special_mode(self.game, phrases):
             self._logger.debug('Frotz mode started.')
-            t = tp.textPlayer(game+'.z5')
+            t = tp.textPlayer(self.game+'.z5')
             response = t.run()
+            if( os.path.isfile(self.savefile)):
+                t.restore(self.savefile)
+                response = t.execute_command('l')
             current_location=response.location
             self._mic.say(response.location)
             if( response.description ):
@@ -70,16 +78,18 @@ class FrotzPlugin(plugin.SpeechHandlerPlugin):
                     #mic.say(_('Pardon?'))
                     continue
 
-                print( "Text: text" )
-                response = t.execute_command(text)
-                if( text==["END SIMULATION"] ):
+                if( "END SIMULATION" in text ):
                     mode_not_stopped = False
                 else:
+                    response = t.execute_command(text)
                     say_location=False
                     # You don't have to state the location at the beginning of each response
-                    # For the most part, I only need a location update when 
+                    # For the most part, I only need a location update when the location changes
+                    # or if I ask for "look" or "where am i"
                     if( current_location!=response.location ):
                         current_location=response.location
+                        say_location=True
+                    if( text==['LOOK'] or text==['WHERE AM I'] ):
                         say_location=True
                     if( not response.description ):
                         say_location=True
@@ -88,7 +98,10 @@ class FrotzPlugin(plugin.SpeechHandlerPlugin):
                     if( response.description ):
                         self._mic.say(response.description)
 
-        mic.say(self.gettext('Ending simulation'))
+        self._mic.say(self.gettext('Saving simulation'))
+        t.save(self.savefile)
+        t.quit()
+        self._mic.say(self.gettext('Ending simulation'))
         self._logger.debug("Frotz mode stopped.")
 
     # Originally I thought I would have to implement my own version of listen() in order to change

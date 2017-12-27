@@ -6,7 +6,12 @@ from pytz import timezone
 
 class ClockPlugin(plugin.SpeechHandlerPlugin):
     def get_phrases(self):
-        return [self.gettext("TIME")]
+        return [
+            self.gettext("TIME"),
+            self.gettext("WHAT TIME IS IT IN WEST VIRGINIA"),
+            self.gettext("WHAT TIME IS IT IN HAWAII"),
+            self.gettext("WHAT TIME IS IT IN VIRGINIA")
+                ]
 
     """Given an int32 number, print it in English."""
     def int_to_en(self,num):
@@ -52,7 +57,7 @@ class ClockPlugin(plugin.SpeechHandlerPlugin):
     
         raise AssertionError('num is too large: %s' % str(num))
     
-    def handle(self, text, mic):
+    def handle(self, text, mic, *args):
         """
         Reports the current time based on the user's timezone.
 

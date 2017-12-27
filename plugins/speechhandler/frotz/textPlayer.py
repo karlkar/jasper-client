@@ -69,7 +69,6 @@ class textPlayer:
         else:
             print('Game not loaded properly')
 
-
     # Sends buffer from output pipe of game to a queue where it can be retrieved later
     def enqueue_pipe_output(self, output, queue):
         for line in iter(output.readline, b''):
@@ -93,6 +92,8 @@ class textPlayer:
                         print self.execute_command(command)
                 else:
                     print self.execute_command(command)
+        else:
+            print('Game not loaded properly')
 
     # Send a command to the game and return the output
     def execute_command(self, command):
@@ -100,6 +101,8 @@ class textPlayer:
             self.game_process.stdin.write(command + '\n')
             return self.clean_command_output(self.get_command_output())
             #return self.get_command_output()
+        else:
+            print('Game not loaded properly')
 
     # Returns the current score in a game
     def get_score(self):
@@ -134,9 +137,9 @@ class textPlayer:
                 # Sometimes the description contains a copy of the location at the beginning. Remove it if so.
                 #if( left(response.description,len(response.location))==response.location ):
                 #    response.description=response.description[len(response.location)+1:]
-                matchObj=re.findall('^\s*'+response.location+'\s*(.*)$',response.description,re.I)
+                matchObj=re.findall(re.compile('^\s*'+re.escape(response.location)+'\s*(.*)$',re.I),response.description)
                 if( len(matchObj) ):
-                    response.description=matchObj[0][0]
+                    response.description=matchObj[0]
             else:
                 # otherwise, this was a simple error message from the parser which does not include a score
                 response.description=text
@@ -162,7 +165,25 @@ class textPlayer:
             command_output = command_output.replace('  ', ' ')
 
         return command_output
+    
+    def save(self,filename):
+        if self.game_loaded_properly == True:
+            self.game_process.stdin.write('save\n')
+            print( self.get_command_output() )
+            self.game_process.stdin.write(filename+'\n')
+            # seems like dfrotz needs a little time to save the game, so the output is not instanly available
+            time.sleep(1)
+            print( self.get_command_output() )
 
+    def restore(self,filename):
+        if self.game_loaded_properly == True:
+            self.game_process.stdin.write('restore\n')
+            print( self.get_command_output() )
+            self.game_process.stdin.write(filename+'\n')
+            # seems like it takes a little time to load the game, so the output is not instantly available.
+            time.sleep(1)
+            print( self.get_command_output() )
+            
     def quit(self):
         if self.game_loaded_properly == True:
             self.game_process.stdin.write('quit\n')

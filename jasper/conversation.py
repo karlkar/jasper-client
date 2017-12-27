@@ -50,7 +50,7 @@ class Conversation(i18n.GettextMixin):
                 #pdb.set_trace()
                 if plugin and text:
                     try:
-                        plugin.handle(text,self)
+                        plugin.handle(text,self.mic,self)
                     except Exception:
                         self._logger.error('Failed to execute module',
                                            exc_info=True)
