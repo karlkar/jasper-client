@@ -65,6 +65,9 @@ class textPlayer:
             if( self.game_filename=='zork1.z5' ):
                 Response.location="West of House"
                 Response.description="You are standing in an open field west of a white house, with a boarded front door. There is a small mailbox here."
+            elif( self.game_filename=='hhgg.z3' ):
+                Response.location="Bedroom"
+                Response.description="You wake up. The room is spinning very gently round your head. Or at least it would be if you could see it which you can't. It is pitch black."
             return Response
         else:
             print('Game not loaded properly')
@@ -129,7 +132,7 @@ class textPlayer:
         #            print( "Found: %s",mo )
         #        text = text[matchObj.end() + 1:]
         #return text
-        if(self.game_filename=='zork1.z5'):
+        if( (self.game_filename=='zork1.z5')or(self.game_filename=='hhgg.z3') ):
             matchObj=re.findall('^\s*(.*?)\s*Score:\s*[-]*[0-9]+\s*Moves:\s*[-]*[0-9]+\s*(.*)$',text,re.I)
             if( len(matchObj) ):
                 response.location=matchObj[0][0]
@@ -149,6 +152,7 @@ class textPlayer:
     def get_command_output(self):
         command_output = ''
         output_continues = True
+        time.sleep(.2) # for Hitchhiker's guide to the galaxy
 
         # While there is still output in the queue
         while (output_continues):

@@ -71,6 +71,7 @@ plugins/speechhandler/frotz/dfrotz
 
 # Ignore the games from textPlayer
 plugins/speechhandler/frotz/games/*.z5
+plugins/speechhandler/frotz/games/*.z3
 
 # Ignore save games
 plugins/speechhandler/frotz/games/*.sav

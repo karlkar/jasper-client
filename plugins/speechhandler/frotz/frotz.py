@@ -18,18 +18,19 @@ class FrotzPlugin(plugin.SpeechHandlerPlugin):
         self._mic=mic
         if( args ):
             self._conversation=args[0]
-            self._logger=self.conversation._logger
+            self._logger=self._conversation._logger
         else:
             self._logger = logging.getLogger(__name__)
         #pdb.set_trace()
-        self.game="zork1"
+        self.game_file="zork1.z5"
         self.game_name="zork one"
         if( "A MIND FOREVER VOYAGING" in text ):
-            self.game="AMFV"
+            self.game_file="AMFV.z5"
             self.game_name="a mind forever voyaging"
         if( "HITCHHIKERS" in text ):
-            self.game="h2g2"
+            self.game_file="hhgg.z3"
             self.game_name="the hitchhiker's guide to the galaxy"
+        self.game=self.game_file[:self.game_file.find('.')]
         self.savefile=os.path.join(os.path.dirname(os.path.realpath(__file__)),"games",self.game+".sav")
         self._mic.say(self.gettext("beginning simulation "+self.game_name))
         #active_stt_slug = conversation.config['stt_engine']
@@ -56,7 +57,7 @@ class FrotzPlugin(plugin.SpeechHandlerPlugin):
         self._logger.debug('Starting frotz mode...')
         with self._mic.special_mode(self.game, phrases):
             self._logger.debug('Frotz mode started.')
-            t = tp.textPlayer(self.game+'.z5')
+            t = tp.textPlayer(self.game_file)
             response = t.run()
             if( os.path.isfile(self.savefile)):
                 t.restore(self.savefile)
