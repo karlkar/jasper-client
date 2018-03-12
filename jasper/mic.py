@@ -15,6 +15,7 @@ else:  # NOQA
     import queue
 
 from . import alteration
+from . import i18n
 from . import paths
 
 
@@ -31,7 +32,7 @@ def get_config_value(config, name, default):
     return value if value else default
 
 
-class Mic(object):
+class Mic(i18n.GettextMixin):
     """
     The Mic class handles all interactions with the microphone and speaker.
     """
@@ -39,6 +40,8 @@ class Mic(object):
     def __init__(self, input_device, output_device,
                  passive_stt_engine, active_stt_engine,
                  tts_engine, config, keyword='JASPER'):
+        translations = i18n.parse_translations(paths.data('locale'))
+        i18n.GettextMixin.__init__(self, translations, config)
         self._logger = logging.getLogger(__name__)
         self._keyword = keyword
         self.tts_engine = tts_engine
@@ -53,7 +56,7 @@ class Mic(object):
         self._input_chunksize = get_config_value(config, 'input_chunksize',1024)
         self._output_chunksize = get_config_value(config, 'output_chunksize',1024)
         self._yes=tempfile.SpooledTemporaryFile()
-        self._yes.write(self.tts_engine.say("yes"))
+        self._yes.write(self.tts_engine.say(self.gettext("yes")))
         try:
             output_padding = config['audio']['output_padding']
         except KeyError:

@@ -1,9 +1,9 @@
 [Plugin]
-Name = joke
+Name = hass
 Version = 1.0.0
 License = MIT
 URL = http://jasperproject.github.io/
-Description = Tells you a cheezy "Knock Knock" joke
+Description = Handle Home Assistant requests
 
 [Author]
 Name = Jasper Project

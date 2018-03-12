@@ -74,11 +74,11 @@ class JuliusSTTPlugin(plugin.STTPlugin):
                '-quiet',
                '-nolog',
                '-input', 'stdin',
-               '-dfa', self._vocabulary.dfa_file,
-               '-v', self._vocabulary.dict_file,
+               '-dfa', self._dfa_file,
+               '-v', self._dict_file,
                '-h', self._hmmdefs,
                '-hlist', self._tiedlist,
-               '-forcedict']
+               ]
         cmd = [str(x) for x in cmd]
         self._logger.debug('Executing: %r', cmd)
         with tempfile.SpooledTemporaryFile() as out_f:

@@ -191,10 +191,6 @@ class Jasper(object):
             msg = 'No plugins for handling speech found!'
             self._logger.error(msg)
             raise RuntimeError(msg)
-        elif len(self.brain.get_plugin_phrases()) == 0:
-            msg = 'No command phrases found!'
-            self._logger.error(msg)
-            raise RuntimeError(msg)
 
         active_stt_plugin_info = self.plugins.get_plugin(active_stt_slug, category='stt')
         #pdb.set_trace()

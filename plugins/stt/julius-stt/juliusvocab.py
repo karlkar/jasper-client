@@ -64,7 +64,7 @@ def get_dict_path(path):
     return os.path.join(path, 'dict')
 
 
-def get_grammar(phrases):
+def get_grammar():
     return {'S': [['NS_B', 'WORD_LOOP', 'NS_E']],
             'WORD_LOOP': [['WORD_LOOP', 'WORD'], ['WORD']]}
 
@@ -88,19 +88,19 @@ def get_word_defs(lexicon, phrases):
     return word_defs
 
 
-def compile_vocabulary(directory, phrases, profile):
+def compile_vocabulary(config, directory, phrases):
     logger = logging.getLogger(__name__)
     prefix = 'jasper'
     tmpdir = tempfile.mkdtemp()
 
     lexicon_file = paths.data('julius-stt', 'VoxForge.tgz')
-    lexicon_archive_member = 'VoxForge/VoxForgeDict'
-    if 'julius' in profile:
-        if 'lexicon' in profile['julius']:
-            lexicon_file = profile['julius']['lexicon']
-        if 'lexicon_archive_member' in profile['julius']:
+    lexicon_archive_member = None
+    if 'julius' in config:
+        if 'lexicon' in config['julius']:
+            lexicon_file = config['julius']['lexicon']
+        if 'lexicon_archive_member' in config['julius']:
             lexicon_archive_member = \
-                profile['julius']['lexicon_archive_member']
+                config['julius']['lexicon_archive_member']
 
     lexicon = VoxForgeLexicon(lexicon_file, lexicon_archive_member)
 
@@ -108,7 +108,7 @@ def compile_vocabulary(directory, phrases, profile):
     tmp_grammar_file = os.path.join(tmpdir,
                                     os.extsep.join([prefix, 'grammar']))
     with open(tmp_grammar_file, 'w') as f:
-        grammar = get_grammar(phrases)
+        grammar = get_grammar()
         for definition in grammar.pop('S'):
             f.write("%s: %s\n" % ('S', ' '.join(definition)))
         for name, definitions in grammar.items():

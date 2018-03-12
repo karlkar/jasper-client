@@ -21,20 +21,20 @@ msgstr ""
 #: client/conversation.py:24
 #, python-format
 msgid "How can I be of service, %s?"
-msgstr ""
+msgstr "Czym mogę służyć, %s?"
 
 #: client/conversation.py:27
 msgid "How can I be of service?"
-msgstr ""
+msgstr "Czym mogę służyć?"
 
 #: client/conversation.py:53
 msgid "I'm sorry. I had some trouble with that operation. Please try again later."
-msgstr ""
+msgstr "Przykro mi. Wystąpił błąd. Spróbuj później."
 
 #: client/conversation.py:60
 msgid "Pardon?"
-msgstr ""
+msgstr "Słucham?"
 
 #: client/mic.py:59
 msgid "yes"
-msgstr ""
+msgstr "tak"

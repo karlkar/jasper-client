@@ -217,6 +217,7 @@ class PluginStore(object):
         else:
             plugins = self.get_plugins_by_category(category)
         for plugin_info in plugins:
+            self._logger.debug("KAROL: %s", plugin_info.name)
             if plugin_info.name == name:
                 return plugin_info
         raise PluginError("Plugin '%s' not found!" % name)

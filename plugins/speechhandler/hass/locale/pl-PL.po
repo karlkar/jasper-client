@@ -18,23 +18,5 @@ msgstr ""
 "X-Generator: Poedit 1.8.5\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: client/conversation.py:24
-#, python-format
-msgid "How can I be of service, %s?"
-msgstr ""
-
-#: client/conversation.py:27
-msgid "How can I be of service?"
-msgstr ""
-
-#: client/conversation.py:53
-msgid "I'm sorry. I had some trouble with that operation. Please try again later."
-msgstr ""
-
-#: client/conversation.py:60
-msgid "Pardon?"
-msgstr ""
-
-#: client/mic.py:59
-msgid "yes"
-msgstr ""
+msgid "Error occurred"
+msgstr "Wystąpił błąd"

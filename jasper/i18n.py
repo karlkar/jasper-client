@@ -32,7 +32,6 @@ class GettextMixin(object):
             language = self.__config['language']
         except KeyError:
             language = 'en-US'
-
         if language not in self.__translations:
             raise ValueError('Unsupported Language!')
 

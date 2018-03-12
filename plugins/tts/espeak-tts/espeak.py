@@ -93,12 +93,12 @@ class EspeakTTSPlugin(plugin.TTSPlugin):
 
     def say(self, phrase):
         with tempfile.SpooledTemporaryFile() as out_f:
-            cmd = ['espeak', '-v', self.voice,
-                             '-p', self.pitch_adjustment,
-                             '-s', self.words_per_minute,
+            cmd = ['espeak', '-v', str(self.voice),
+                             '-p', str(self.pitch_adjustment),
+                             '-s', str(self.words_per_minute),
                              '--stdout',
                              phrase]
-            cmd = [str(x) for x in cmd]
+            #cmd = [u'' + x for x in cmd]
             self._logger.debug('Executing %s', ' '.join([pipes.quote(arg)
                                                          for arg in cmd]))
             subprocess.call(cmd, stdout=out_f)

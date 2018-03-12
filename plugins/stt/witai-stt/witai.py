@@ -86,12 +86,12 @@ class WitAiSTTPlugin(plugin.STTPlugin):
         received text from json answer.
         """
         data = fp.read()
-        r = requests.post('https://api.wit.ai/speech?v=20160526',
+        r = requests.post('https://api.wit.ai/speech?v=20170307',
                           data=data,
                           headers=self.headers)
         try:
             r.raise_for_status()
-            text = r.json()['_text']
+            text = r.json()
         except requests.exceptions.HTTPError:
             self._logger.critical('Request failed with response: %r',
                                   r.text,
@@ -109,6 +109,6 @@ class WitAiSTTPlugin(plugin.STTPlugin):
                                   exc_info=True)
             return []
         else:
-            transcribed = [text.upper()]
+            transcribed = [text]
             self._logger.info('Transcribed: %r', transcribed)
             return transcribed
